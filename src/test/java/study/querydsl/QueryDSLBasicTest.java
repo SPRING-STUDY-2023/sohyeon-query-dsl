@@ -1,6 +1,7 @@
 package study.querydsl;
 
 import static org.assertj.core.api.Assertions.*;
+import static study.querydsl.entity.QMember.*;
 
 import javax.persistence.EntityManager;
 
@@ -60,13 +61,12 @@ public class QueryDSLBasicTest {
 	@Test
 	public void startQueryDSL() {
 		// find member1
-		QMember m = new QMember("m");
 		String username = "member1";
 
 		Member foundMember = queryFactory
-			.select(m)
-			.from(m)
-			.where(m.username.eq(username))
+			.select(member)
+			.from(member)
+			.where(member.username.eq(username))
 			.fetchOne();
 
 		assertThat(foundMember.getUsername()).isEqualTo(username);
