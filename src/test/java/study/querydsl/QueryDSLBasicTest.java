@@ -637,4 +637,39 @@ public class QueryDSLBasicTest {
 	private BooleanExpression allEq(String usernameCond, Integer ageCond) {
 		return usernameEq(usernameCond).and(ageEq(ageCond));
 	}
+
+	@Test
+	public void bulkUpdate() {
+
+		// member1: 비회원
+		// member2: 비회원
+		// 나머지 유지
+
+		// 바로 DB로 가기 때문에 영속성 컨텍스트에는 변화 X
+		long count = queryFactory
+			.update(member)
+			.set(member.username, "비회원")
+			.where(member.age.lt(20))
+			.execute();
+
+		// 벌크 연산 후 플러시 필요
+		em.flush();
+		em.clear();
+	}
+
+	@Test
+	public void bulkAdd() {
+		long count = queryFactory
+			.update(member)
+			.set(member.age, member.age.add(1)) // 빼고 싶을 때는 .add(-1)
+			.execute();
+	}
+
+	@Test
+	public void bulkDelete() {
+		long count = queryFactory
+			.delete(member)
+			.where(member.age.gt(18))
+			.execute();
+	}
 }
