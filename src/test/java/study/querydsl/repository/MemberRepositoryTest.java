@@ -77,7 +77,7 @@ class MemberRepositoryTest {
 
 
 	@Test
-	public void searchPageSimpleTest() {
+	public void searchPageTest() {
 		Team teamA = new Team("teamA");
 		Team teamB = new Team("teamB");
 		em.persist(teamA);

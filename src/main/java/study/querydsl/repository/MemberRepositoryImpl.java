@@ -1,5 +1,6 @@
 package study.querydsl.repository;
 
+import static org.springframework.data.support.PageableExecutionUtils.*;
 import static org.springframework.util.StringUtils.*;
 import static study.querydsl.entity.QMember.*;
 import static study.querydsl.entity.QTeam.*;
@@ -9,8 +10,10 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -66,7 +69,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 			.limit(pageable.getPageSize())
 			.fetch();
 
-		long total = queryFactory
+		JPAQuery<Long> countQuery = queryFactory
 			.select(member.count())
 			.from(member)
 			.leftJoin(member.team, team)
@@ -75,10 +78,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				teamNameEq(condition.getTeamName()),
 				ageGoe(condition.getAgeGoe()),
 				ageLoe(condition.getAgeLoe())
-			)
-			.stream().count();
+			);
 
-		return new PageImpl<>(content, pageable, total);
+		return getPage(content, pageable, () -> countQuery.stream().count());
 	}
 
 	private BooleanExpression usernameEq(String username) {
