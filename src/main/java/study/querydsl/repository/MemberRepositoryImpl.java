@@ -6,6 +6,10 @@ import static study.querydsl.entity.QTeam.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -38,6 +42,43 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				ageLoe(condition.getAgeLoe())
 			)
 			.fetch();
+	}
+
+	@Override
+	public Page<MemberTeamDto> searchPage(MemberSearchCondition condition, Pageable pageable) {
+		List<MemberTeamDto> content = queryFactory
+			.select(new QMemberTeamDto(
+				member.id.as("memberId"),
+				member.username,
+				member.age,
+				team.id.as("teamId"),
+				team.name.as("teamName")
+			))
+			.from(member)
+			.leftJoin(member.team, team)
+			.where(
+				usernameEq(condition.getUsername()),
+				teamNameEq(condition.getTeamName()),
+				ageGoe(condition.getAgeGoe()),
+				ageLoe(condition.getAgeLoe())
+			)
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.fetch();
+
+		long total = queryFactory
+			.select(member.count())
+			.from(member)
+			.leftJoin(member.team, team)
+			.where(
+				usernameEq(condition.getUsername()),
+				teamNameEq(condition.getTeamName()),
+				ageGoe(condition.getAgeGoe()),
+				ageLoe(condition.getAgeLoe())
+			)
+			.stream().count();
+
+		return new PageImpl<>(content, pageable, total);
 	}
 
 	private BooleanExpression usernameEq(String username) {
