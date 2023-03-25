@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Wildcard;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -70,7 +71,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 			.fetch();
 
 		JPAQuery<Long> countQuery = queryFactory
-			.select(member.count())
+			.select(Wildcard.count)
 			.from(member)
 			.leftJoin(member.team, team)
 			.where(
@@ -80,7 +81,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
 				ageLoe(condition.getAgeLoe())
 			);
 
-		return getPage(content, pageable, () -> countQuery.stream().count());
+		return getPage(content, pageable, () -> countQuery.fetch().get(0));
 	}
 
 	private BooleanExpression usernameEq(String username) {
