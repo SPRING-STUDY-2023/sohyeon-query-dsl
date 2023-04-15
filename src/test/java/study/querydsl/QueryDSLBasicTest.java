@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.BooleanBuilder;
@@ -36,6 +37,7 @@ import study.querydsl.entity.QMember;
 import study.querydsl.entity.Team;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @Transactional
 public class QueryDSLBasicTest {
 
